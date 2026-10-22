@@ -52,18 +52,34 @@ const impWords={
  Animals:[['Dog','Wafadari ka doosra naam'],['Elephant','Sabse bada zameeni jaanwar'],['Lion','Jungle ka raja'],['Cat','Doodh ki chor, meow boli'],['Horse','Daudne wala wafadar saathi'],['Monkey','Ped par uchhal-kood'],['Tiger','Dhaaridaar shikari'],['Cow','Gaushala me milti hai'],['Snake','Bina pair ke rengne wala'],['Peacock','Baarish me nachne wala pakshi'],['Fish','Paani ke bina nahi reh sakti'],['Bear','Sardi me lambi neend sone wala']],
  'College Life':[['Hostel','Ghar se door wala kamra'],['Exam Hall','Pin-drop silence wala stress'],['Canteen','Bunk karke chai peene ki jagah'],['Lecture','Neend bulane wali class'],['Assignment','Last night copy karne wala kaam'],['Fest','Saal ka sabse bada hungama'],['Library Card','Kitaab lene ka pass'],['Attendance','75 percent wala tension'],['Group Study','Padhai kam, baatein zyada'],['Viva','Sir ke sawalon ka darr'],['Practical File','Haath se likhne wali record file'],['Semester Break','Exam ke baad ki azaadi']],
  'Daily Life':[['Toothbrush','Subah ki pehli mulaqat'],['Sabun','Jhaag banane wala saathi'],['Takiya','Neend ka naram sahara'],['Chappal','Ghar me pehenne wali'],['Kangi','Baalon ko suljhane wali'],['Towel','Nahane ke baad ka dost'],['Balti','Paani bharne wali'],['Jhaadu','Safai ka hathiyaar'],['Pankha','Garmi me ghumne wala'],['Ghadi','Samay batane wali'],['Chashma','Aankhon par chadha frame'],['School Bag','Peeth par latka bojh'],['Paani ki Bottle','Pyaas bujhane wali'],['TV Remote','Sofa par baithe channel badalne wala'],['Charger','Phone ki jaan bachane wala'],['Kursi','Baithne ke kaam aati hai'],['Chaabi','Taala kholne wali'],['Aaina','Khud ko dekhne wala'],['Torch','Andhere me roshni karne wala']]};
-const impState={scores:{},players:0,names:{}};
+const impState={scores:{},players:0,names:{},cats:null};
 function imposter(m){
- let players=5,imps=1,cat='Mixed',mins=2,scores=impState.scores,word='',hint='',impSet=new Set(),round=1,timerInt=null,timeLeft=0,votes={};
+ let players=5,imps=1,selCats=new Set(impState.cats&&impState.cats.length?impState.cats:Object.keys(impWords)),mins=2,scores=impState.scores,word='',hint='',impSet=new Set(),round=1,timerInt=null,timeLeft=0,votes={};
  const names=impState.names;
  const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const nameOf=i=>{const n=(names[i]||'').trim();return n?n:'Player '+i};
  if(impState.players!==players){scores={};impState.scores=scores;impState.players=players}
  function scoreHTML(){const rows=Object.keys(scores);if(!rows.length)return'';return `<div class="imp-scores"><strong>Scores</strong>${rows.map(k=>`<span>${esc(nameOf(+k))}: <b>${scores[k]}</b></span>`).join('')}</div>`}
- function setup(){clearInterval(timerInt);ui(m,`<div class="status-bar"><span>Pass &amp; Play</span><span>3–10 players · 1 phone</span></div>
+ const buzz=p=>{try{if(navigator.vibrate)navigator.vibrate(p)}catch(e){}};
+ let fxTimer=null,confShoot=null;
+ function clearFx(){if(fxTimer){clearTimeout(fxTimer);fxTimer=null}document.body.classList.remove('doomed','doom-lite');document.querySelectorAll('.imp-doom').forEach(o=>o.remove())}
+ function doomFx(lite){clearFx();const ov=document.createElement('div');ov.className='imp-doom';document.body.appendChild(ov);fxTimer=setTimeout(()=>{document.body.classList.add(lite?'doom-lite':'doomed');const h=m.querySelector('.imp-center h2');if(h&&!lite){h.classList.add('glitch');h.setAttribute('data-text',h.textContent)}},85)}
+ function fireConfetti(big){try{
+  if(!window.confetti)return;
+  if(!confShoot){let cv=document.querySelector('.imp-confetti-canvas');if(!cv){cv=document.createElement('canvas');cv.className='imp-confetti-canvas';document.body.appendChild(cv)}confShoot=confetti.create(cv,{resize:true,useWorker:true,disableForReducedMotion:true})}
+  const colors=['#d7ff4f','#ffffff','#ffe14f','#4fe3c1'];
+  const base=(window.innerWidth<600?70:120)*(big?1:.45);
+  const defs={origin:{y:.65},colors,ticks:185,zIndex:210,disableForReducedMotion:true};
+  const fire=(r,o)=>confShoot(Object.assign({},defs,o,{particleCount:Math.max(8,Math.floor(base*r))}));
+  fire(.3,{spread:32,startVelocity:42});
+  setTimeout(()=>fire(.25,{spread:62}),150);
+  setTimeout(()=>fire(.25,{spread:100,scalar:.85}),300);
+  if(big)setTimeout(()=>fire(.2,{spread:128,startVelocity:32,scalar:1.05}),460);
+ }catch(e){}}
+ function setup(){clearInterval(timerInt);clearFx();ui(m,`<div class="status-bar"><span>Pass &amp; Play</span><span>3–10 players · 1 phone</span></div>
  <div class="imp-block"><p class="imp-label">Kitne players?</p><div class="imp-count"><button class="control-btn" id="im">−</button><strong id="ipl">${players}</strong><button class="control-btn" id="ip">+</button></div></div>
  <div class="imp-block"><p class="imp-label">Players ke naam likho (optional — khaali chhodo to Player 1, 2...)</p><div class="imp-names" id="inames"></div></div>
- <div class="imp-block"><p class="imp-label">Category</p><div class="choices" id="icat">${['Mixed',...Object.keys(impWords)].map(c=>`<button class="choice${c===cat?' correct':''}" data-c="${c}">${c}</button>`).join('')}</div></div>
+ <div class="imp-block"><p class="imp-label">Categories — jitni chaaho chun lo (kam se kam 1)</p><div class="choices" id="icat">${Object.keys(impWords).map(c=>`<button class="choice imp-cat${selCats.has(c)?' correct':''}" data-c="${c}">${c} · ${impWords[c].length}</button>`).join('')}</div><div class="imp-catrow"><button class="imp-mini" id="iall">Sab select karo</button><button class="imp-mini" id="inone">Sab hatao</button></div><p class="imp-pool" id="ipool"></p></div>
  <div class="imp-block"><p class="imp-label">Imposters</p><div class="choices" id="iimp">${[1,2].map(n=>`<button class="choice${n===imps?' correct':''}" data-n="${n}">${n}</button>`).join('')}</div></div>
  <div class="imp-block"><p class="imp-label">Discussion time</p><div class="choices" id="itime">${[1,2,3].map(n=>`<button class="choice${n===mins?' correct':''}" data-n="${n}">${n} min</button>`).join('')}</div></div>
  <button class="control-btn primary imp-big" id="istart">Game shuru karo →</button>
@@ -72,11 +88,15 @@ function imposter(m){
  renderNames();
  $('#im',m).onclick=()=>{players=Math.max(3,players-1);if(imps>=players-1)imps=1;$('#ipl',m).textContent=players;renderNames()};
  $('#ip',m).onclick=()=>{players=Math.min(10,players+1);$('#ipl',m).textContent=players;renderNames()};
- $$('#icat .choice',m).forEach(b=>b.onclick=()=>{cat=b.dataset.c;$$('#icat .choice',m).forEach(x=>x.classList.toggle('correct',x===b))});
+ function updCats(){impState.cats=[...selCats];const pl=$('#ipool',m);if(pl)pl.textContent=selCats.size?('🎲 '+selCats.size+(selCats.size>1?' categories':' category')+' · kul '+[...selCats].reduce((a,c)=>a+impWords[c].length,0)+' words khel me hain'):'⚠️ Kam se kam 1 category chuno!';const st=$('#istart',m);if(st)st.disabled=!selCats.size;$$('#icat .choice',m).forEach(b=>b.classList.toggle('correct',selCats.has(b.dataset.c)))}
+ $$('#icat .choice',m).forEach(b=>b.onclick=()=>{const c=b.dataset.c;if(selCats.has(c))selCats.delete(c);else selCats.add(c);updCats()});
+ $('#iall',m).onclick=()=>{Object.keys(impWords).forEach(c=>selCats.add(c));updCats()};
+ $('#inone',m).onclick=()=>{selCats.clear();updCats()};
+ updCats();
  $$('#iimp .choice',m).forEach(b=>b.onclick=()=>{const n=+b.dataset.n;if(n===2&&players<5){$('#istart',m).scrollIntoView();return}imps=n;$$('#iimp .choice',m).forEach(x=>x.classList.toggle('correct',x===b))});
  $$('#itime .choice',m).forEach(b=>b.onclick=()=>{mins=+b.dataset.n;$$('#itime .choice',m).forEach(x=>x.classList.toggle('correct',x===b))});
  $('#istart',m).onclick=()=>{if(impState.players!==players){scores={};impState.scores=scores;impState.players=players}for(let i=1;i<=players;i++)if(scores[i]===undefined)scores[i]=0;startRound()}}
- function startRound(){const pool=cat==='Mixed'?Object.values(impWords).flat():impWords[cat];const pick=pool[Math.floor(Math.random()*pool.length)];word=pick[0];hint=pick[1];impSet=new Set();while(impSet.size<imps)impSet.add(1+Math.floor(Math.random()*players));reveal(1)}
+ function startRound(){const pool=[...selCats].flatMap(c=>impWords[c]);const pick=pool[Math.floor(Math.random()*pool.length)];word=pick[0];hint=pick[1];impSet=new Set();while(impSet.size<imps)impSet.add(1+Math.floor(Math.random()*players));reveal(1)}
  function reveal(i){if(i>players)return discussion();const isImp=impSet.has(i);ui(m,`<div class="imp-center"><p class="eyebrow">PHONE ${esc(nameOf(i)).toUpperCase()} KO DO</p><h2>${esc(nameOf(i))}</h2><p class="imp-sub">Baaki sab door dekho! Sirf ${esc(nameOf(i))} apna word dekhega.</p>
  <div class="imp-reveal" id="irev"><span id="irevt">👁️ DABAA KE RAKHO</span></div>
  <p class="imp-sub">Button par ungli dabaa ke rakho — word dikhega. Chhodo ge to chhup jayega.</p>
@@ -93,31 +113,35 @@ function imposter(m){
  <p class="imp-sub">Pehle hint dega: <strong>${esc(nameOf(starter))}</strong></p>
  <div class="controls" style="justify-content:center"><button class="control-btn primary" id="itog">⏸ Pause</button><button class="control-btn" id="iadd">+30 sec</button><button class="control-btn" id="ivote">Voting par jao →</button></div>
  <div class="game-message" id="idmsg" aria-live="polite"></div></div>`);
- let running=true;const tick=()=>{timeLeft--;$('#itim',m).textContent=fmt(Math.max(0,timeLeft));if(timeLeft<=0){clearInterval(timerInt);$('#idmsg',m).textContent='⏰ Time khatm! Ab voting karo.';$('#itog',m).disabled=true}};
+ let running=true;const tick=()=>{timeLeft--;const tel=$('#itim',m);tel.textContent=fmt(Math.max(0,timeLeft));if(timeLeft<=10&&timeLeft>5)tel.classList.add('warn');if(timeLeft<=5&&timeLeft>0){tel.classList.add('danger');if(timeLeft===5)buzz(30)}if(timeLeft<=0){clearInterval(timerInt);$('#idmsg',m).textContent='⏰ Time khatm! Ab voting karo.';$('#itog',m).disabled=true}};
  timerInt=setInterval(tick,1000);
  $('#itog',m).onclick=()=>{if(running){clearInterval(timerInt);$('#itog',m).textContent='▶ Resume'}else{timerInt=setInterval(tick,1000);$('#itog',m).textContent='⏸ Pause'}running=!running};
  $('#iadd',m).onclick=()=>{timeLeft+=30;$('#itim',m).textContent=fmt(timeLeft)};
  $('#ivote',m).onclick=()=>{clearInterval(timerInt);groupVote()}}
  function groupVote(){const sel=new Set();
-  function render(){ui(m,`<div class="imp-center"><p class="eyebrow">VOTING</p><h2>Sab discuss karke faisla karo</h2><p class="imp-sub">Saamne sabke naam hain — milkar baat karo aur jise Imposter samajhte ho, use chuno. ${imps>1?`<b>${imps} imposters hain, isliye ${imps} naam</b> chunne hain`:'<b>1 imposter hai, isliye sirf 1 naam</b> chunna hai'} — abhi chune: <b>${sel.size}/${imps}</b></p>
-  <div class="choices imp-votes">${Array.from({length:players},(_,k)=>k+1).map(j=>`<button class="choice${sel.has(j)?' correct':''}" data-j="${j}">${esc(nameOf(j))}</button>`).join('')}</div>
-  <button class="control-btn primary imp-big" id="iconfirm" ${sel.size===imps?'':'disabled'}>Yehi final hai → Pakdo!</button>
+  ui(m,`<div class="imp-center"><p class="eyebrow">VOTING</p><h2>Sab discuss karke faisla karo</h2><p class="imp-sub">Saamne sabke naam hain — milkar baat karo aur jise Imposter samajhte ho, use chuno. ${imps>1?`<b>${imps} imposters hain, isliye ${imps} naam</b> chunne hain`:'<b>1 imposter hai, isliye sirf 1 naam</b> chunna hai'} — abhi chune: <b id="icount">0/${imps}</b></p>
+  <div class="choices imp-votes">${Array.from({length:players},(_,k)=>k+1).map(j=>`<button class="choice" data-j="${j}">${esc(nameOf(j))}</button>`).join('')}</div>
+  <button class="control-btn primary imp-big" id="iconfirm" disabled>Yehi final hai → Pakdo!</button>
   <p class="imp-sub">Naam par dobara tap karne se chunav hat jayega.</p></div>`);
-  $$('.imp-votes .choice',m).forEach(b=>b.onclick=()=>{const j=+b.dataset.j;if(sel.has(j))sel.delete(j);else{if(sel.size>=imps)return;sel.add(j)}render()});
+  function upd(){$$('.imp-votes .choice',m).forEach(b=>b.classList.toggle('correct',sel.has(+b.dataset.j)));$('.imp-votes',m).classList.toggle('has-sel',sel.size>0);$('#icount',m).textContent=sel.size+'/'+imps;$('#iconfirm',m).disabled=sel.size!==imps}
+  $$('.imp-votes .choice',m).forEach(b=>b.onclick=()=>{const j=+b.dataset.j;if(sel.has(j))sel.delete(j);else{if(sel.size>=imps)return;sel.add(j)}upd()});
   $('#iconfirm',m).onclick=()=>result(sel)}
-  render()}
  function result(sel){const caughtSet=[...sel].filter(j=>impSet.has(j));const escSet=[...impSet].filter(j=>!sel.has(j));const allCaught=escSet.length===0;const noneCaught=caughtSet.length===0;
  if(caughtSet.length)for(let j=1;j<=players;j++)if(!impSet.has(j))scores[j]++;
  escSet.forEach(j=>scores[j]+=2);
  const impList=[...impSet].map(j=>nameOf(j)).join(' aur ');
  const selList=[...sel].map(j=>nameOf(j)).join(' aur ');
  ui(m,`<div class="imp-center"><p class="eyebrow">REVEAL</p><h2>${allCaught?'🎉 Imposter pakda gaya!':noneCaught?'😈 Imposter bach gaya!':'😐 Ek pakda gaya, ek bach gaya!'}</h2>
- <p class="imp-sub">Imposter tha: <strong>${esc(impList)}</strong> · Secret word tha: <strong>${word}</strong></p>
+ <p class="imp-sub">Imposter tha: <strong class="imp-spot">${esc(impList)}</strong> · Secret word tha: <strong>${word}</strong></p>
  <p class="imp-sub">Group ne in par ungli uthayi thi: <strong>${esc(selList)}</strong>. ${allCaught?'Crew ke har player ko +1 point.':noneCaught?'Imposter ko +2 points!':`Pakde gaye imposter par crew ko safalta — crew ke har player ko +1, aur bache hue Imposter ko +2 points!`}</p>
  ${scoreHTML()}
  <div class="controls" style="justify-content:center;margin-top:18px"><button class="control-btn primary" id="iagain">↻ Ek aur round (Round ${round+1})</button><button class="control-btn" id="isetup">Setup badlo</button></div></div>`);
- $('#iagain',m).onclick=()=>{round++;startRound()};
- $('#isetup',m).onclick=()=>{round=1;setup()}}
+ const h2=m.querySelector('.imp-center h2');
+ if(allCaught){if(h2)h2.classList.add('win-pop');fireConfetti(true);buzz([40,60,40,60,140])}
+ else if(noneCaught){doomFx(false);buzz([200,80,200])}
+ else{doomFx(true);fireConfetti(false);buzz([60,40,60])}
+ $('#iagain',m).onclick=()=>{clearFx();round++;startRound()};
+ $('#isetup',m).onclick=()=>{clearFx();round=1;setup()}}
  setup();
 }
 
