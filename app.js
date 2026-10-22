@@ -46,36 +46,43 @@ function chess(m){ui(m,`<div class="controls"><button class="control-btn primary
 
 const mtBtn=document.querySelector('.menu-toggle'),nvEl=document.querySelector('.nav');if(mtBtn&&nvEl&&!document.body.dataset.page){mtBtn.addEventListener('click',()=>{const open=mtBtn.getAttribute('aria-expanded')==='true';mtBtn.setAttribute('aria-expanded',String(!open));nvEl.classList.toggle('open',!open)});}
 const impWords={
- Food:['Pizza','Biryani','Samosa','Burger','Momos','Maggi','Dosa','Pasta','Jalebi','Sandwich','Chaat','Pancake'],
- Places:['School','Beach','Hospital','Cinema','Railway Station','Market','Temple','Airport','Library','Stadium','Zoo','Hotel'],
- Jobs:['Doctor','Teacher','Chef','Pilot','Farmer','Singer','Police Officer','Driver','Artist','Engineer','Barber','Actor'],
- Animals:['Dog','Elephant','Lion','Cat','Horse','Monkey','Tiger','Cow','Snake','Peacock','Fish','Bear'],
- 'College Life':['Hostel','Exam Hall','Canteen','Lecture','Assignment','Fest','Library Card','Attendance','Group Study','Viva','Practical File','Semester Break']};
-const impState={scores:{},players:0};
+ Food:[['Pizza','Cheese aur oven wali cheez'],['Biryani','Masaledar chawal ki khushboo'],['Samosa','Chai ke saath best dost'],['Burger','Do buns ke beech ki duniya'],['Momos','Steam me banti chhoti potli'],['Maggi','Do minute wala mashhoor jhooth'],['Dosa','South ka crispy paper'],['Pasta','Italy se aayi noodles'],['Jalebi','Ghumavdaar meethi mithaas'],['Sandwich','Bread ke beech sab kuch'],['Chaat','Khatti-meethi gali wali'],['Pancake','Subah ka meetha flat cake']],
+ Places:[['School','Uniform aur ghanti wali jagah'],['Beach','Ret aur lehron ki jagah'],['Hospital','Doctor aur dawai ki jagah'],['Cinema','Badi screen, andhera hall'],['Railway Station','Train pakadne ki daud-bhaag'],['Market','Sabzi aur bheed-bhaad'],['Temple','Ghanti aur prasad wali jagah'],['Airport','Udaan bharne ki jagah'],['Library','Khamoshi aur kitaabein'],['Stadium','Match aur shor wali jagah'],['Zoo','Pinjron me jaanwar'],['Hotel','Kamra book, khana order']],
+ Jobs:[['Doctor','Bimari ka ilaaj karta hai'],['Teacher','Blackboard ke saamne khada'],['Chef','Khana banane ka ustaad'],['Pilot','Aasmaan me chalata hai'],['Farmer','Khet me mehnat karne wala'],['Singer','Mic pakad ke gaata hai'],['Police Officer','Uniform aur danda wala'],['Driver','Steering iske haath me'],['Artist','Rangon se khelne wala'],['Engineer','Design aur jugaad wala'],['Barber','Kainchi chalane wala'],['Actor','Camera ke saamne acting']],
+ Animals:[['Dog','Wafadari ka doosra naam'],['Elephant','Sabse bada zameeni jaanwar'],['Lion','Jungle ka raja'],['Cat','Doodh ki chor, meow boli'],['Horse','Daudne wala wafadar saathi'],['Monkey','Ped par uchhal-kood'],['Tiger','Dhaaridaar shikari'],['Cow','Gaushala me milti hai'],['Snake','Bina pair ke rengne wala'],['Peacock','Baarish me nachne wala pakshi'],['Fish','Paani ke bina nahi reh sakti'],['Bear','Sardi me lambi neend sone wala']],
+ 'College Life':[['Hostel','Ghar se door wala kamra'],['Exam Hall','Pin-drop silence wala stress'],['Canteen','Bunk karke chai peene ki jagah'],['Lecture','Neend bulane wali class'],['Assignment','Last night copy karne wala kaam'],['Fest','Saal ka sabse bada hungama'],['Library Card','Kitaab lene ka pass'],['Attendance','75 percent wala tension'],['Group Study','Padhai kam, baatein zyada'],['Viva','Sir ke sawalon ka darr'],['Practical File','Haath se likhne wali record file'],['Semester Break','Exam ke baad ki azaadi']],
+ 'Daily Life':[['Toothbrush','Subah ki pehli mulaqat'],['Sabun','Jhaag banane wala saathi'],['Takiya','Neend ka naram sahara'],['Chappal','Ghar me pehenne wali'],['Kangi','Baalon ko suljhane wali'],['Towel','Nahane ke baad ka dost'],['Balti','Paani bharne wali'],['Jhaadu','Safai ka hathiyaar'],['Pankha','Garmi me ghumne wala'],['Ghadi','Samay batane wali'],['Chashma','Aankhon par chadha frame'],['School Bag','Peeth par latka bojh'],['Paani ki Bottle','Pyaas bujhane wali'],['TV Remote','Sofa par baithe channel badalne wala'],['Charger','Phone ki jaan bachane wala'],['Kursi','Baithne ke kaam aati hai'],['Chaabi','Taala kholne wali'],['Aaina','Khud ko dekhne wala'],['Torch','Andhere me roshni karne wala']]};
+const impState={scores:{},players:0,names:{}};
 function imposter(m){
- let players=5,imps=1,cat='Mixed',mins=2,scores=impState.scores,word='',impSet=new Set(),round=1,timerInt=null,timeLeft=0,votes={};
+ let players=5,imps=1,cat='Mixed',mins=2,scores=impState.scores,word='',hint='',impSet=new Set(),round=1,timerInt=null,timeLeft=0,votes={};
+ const names=impState.names;
+ const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const nameOf=i=>{const n=(names[i]||'').trim();return n?n:'Player '+i};
  if(impState.players!==players){scores={};impState.scores=scores;impState.players=players}
- function scoreHTML(){const rows=Object.keys(scores);if(!rows.length)return'';return `<div class="imp-scores"><strong>Scores</strong>${rows.map(k=>`<span>Player ${k}: <b>${scores[k]}</b></span>`).join('')}</div>`}
+ function scoreHTML(){const rows=Object.keys(scores);if(!rows.length)return'';return `<div class="imp-scores"><strong>Scores</strong>${rows.map(k=>`<span>${esc(nameOf(+k))}: <b>${scores[k]}</b></span>`).join('')}</div>`}
  function setup(){clearInterval(timerInt);ui(m,`<div class="status-bar"><span>Pass &amp; Play</span><span>3–10 players · 1 phone</span></div>
  <div class="imp-block"><p class="imp-label">Kitne players?</p><div class="imp-count"><button class="control-btn" id="im">−</button><strong id="ipl">${players}</strong><button class="control-btn" id="ip">+</button></div></div>
+ <div class="imp-block"><p class="imp-label">Players ke naam likho (optional — khaali chhodo to Player 1, 2...)</p><div class="imp-names" id="inames"></div></div>
  <div class="imp-block"><p class="imp-label">Category</p><div class="choices" id="icat">${['Mixed',...Object.keys(impWords)].map(c=>`<button class="choice${c===cat?' correct':''}" data-c="${c}">${c}</button>`).join('')}</div></div>
  <div class="imp-block"><p class="imp-label">Imposters</p><div class="choices" id="iimp">${[1,2].map(n=>`<button class="choice${n===imps?' correct':''}" data-n="${n}">${n}</button>`).join('')}</div></div>
  <div class="imp-block"><p class="imp-label">Discussion time</p><div class="choices" id="itime">${[1,2,3].map(n=>`<button class="choice${n===mins?' correct':''}" data-n="${n}">${n} min</button>`).join('')}</div></div>
  <button class="control-btn primary imp-big" id="istart">Game shuru karo →</button>
- <div class="game-message">Ek hi phone sabke haath me ghumega. Sabko secret word milega — <b>sirf Imposter ko nahi!</b> Use baaton se word guess karke bachna hai.</div>${scoreHTML()}`);
- $('#im',m).onclick=()=>{players=Math.max(3,players-1);if(imps>=players-1)imps=1;$('#ipl',m).textContent=players};
- $('#ip',m).onclick=()=>{players=Math.min(10,players+1);$('#ipl',m).textContent=players};
+ <div class="game-message">Ek hi phone sabke haath me ghumega. Sabko secret word milega — <b>sirf Imposter ko nahi!</b> Use word se juda ek <b>hint</b> milega — usi se andaza lagake bachna hai.</div>${scoreHTML()}`);
+ function renderNames(){const box=$('#inames',m);if(!box)return;box.innerHTML=Array.from({length:players},(_,k)=>k+1).map(i=>`<input class="imp-name" data-i="${i}" maxlength="16" placeholder="Player ${i} ka naam" value="${esc(names[i]||'')}">`).join('');$$('.imp-name',m).forEach(inp=>inp.oninput=()=>{names[+inp.dataset.i]=inp.value})}
+ renderNames();
+ $('#im',m).onclick=()=>{players=Math.max(3,players-1);if(imps>=players-1)imps=1;$('#ipl',m).textContent=players;renderNames()};
+ $('#ip',m).onclick=()=>{players=Math.min(10,players+1);$('#ipl',m).textContent=players;renderNames()};
  $$('#icat .choice',m).forEach(b=>b.onclick=()=>{cat=b.dataset.c;$$('#icat .choice',m).forEach(x=>x.classList.toggle('correct',x===b))});
  $$('#iimp .choice',m).forEach(b=>b.onclick=()=>{const n=+b.dataset.n;if(n===2&&players<5){$('#istart',m).scrollIntoView();return}imps=n;$$('#iimp .choice',m).forEach(x=>x.classList.toggle('correct',x===b))});
  $$('#itime .choice',m).forEach(b=>b.onclick=()=>{mins=+b.dataset.n;$$('#itime .choice',m).forEach(x=>x.classList.toggle('correct',x===b))});
  $('#istart',m).onclick=()=>{if(impState.players!==players){scores={};impState.scores=scores;impState.players=players}for(let i=1;i<=players;i++)if(scores[i]===undefined)scores[i]=0;startRound()}}
- function startRound(){const pool=cat==='Mixed'?Object.values(impWords).flat():impWords[cat];word=pool[Math.floor(Math.random()*pool.length)];impSet=new Set();while(impSet.size<imps)impSet.add(1+Math.floor(Math.random()*players));reveal(1)}
- function reveal(i){if(i>players)return discussion();const isImp=impSet.has(i);ui(m,`<div class="imp-center"><p class="eyebrow">PHONE PLAYER ${i} KO DO</p><h2>Player ${i}</h2><p class="imp-sub">Baaki sab door dekho! Sirf Player ${i} apna word dekhega.</p>
+ function startRound(){const pool=cat==='Mixed'?Object.values(impWords).flat():impWords[cat];const pick=pool[Math.floor(Math.random()*pool.length)];word=pick[0];hint=pick[1];impSet=new Set();while(impSet.size<imps)impSet.add(1+Math.floor(Math.random()*players));reveal(1)}
+ function reveal(i){if(i>players)return discussion();const isImp=impSet.has(i);ui(m,`<div class="imp-center"><p class="eyebrow">PHONE ${esc(nameOf(i)).toUpperCase()} KO DO</p><h2>${esc(nameOf(i))}</h2><p class="imp-sub">Baaki sab door dekho! Sirf ${esc(nameOf(i))} apna word dekhega.</p>
  <div class="imp-reveal" id="irev"><span id="irevt">👁️ DABAA KE RAKHO</span></div>
  <p class="imp-sub">Button par ungli dabaa ke rakho — word dikhega. Chhodo ge to chhup jayega.</p>
- <button class="control-btn primary imp-big" id="inext" disabled>Dekh liya → ${i===players?'Discussion shuru':'Player '+(i+1)+' ko do'}</button></div>`);
+ <button class="control-btn primary imp-big" id="inext" disabled>Dekh liya → ${i===players?'Discussion shuru':esc(nameOf(i+1))+' ko do'}</button></div>`);
  const rev=$('#irev',m),rt=$('#irevt',m);let seen=false;
- const show=e=>{e.preventDefault();rt.textContent=isImp?'🕵️ TUM IMPOSTER HO!':word;rev.classList.add('show');if(!seen){seen=true;$('#inext',m).disabled=false}};
+ const show=e=>{e.preventDefault();if(isImp){rt.innerHTML='🕵️ TUM IMPOSTER HO!<br><small style="font-size:.45em;font-weight:600">💡 Hint: '+esc(hint)+'</small>'}else{rt.textContent=word};rev.classList.add('show');if(!seen){seen=true;$('#inext',m).disabled=false}};
  const hide=()=>{rt.textContent='👁️ DABAA KE RAKHO';rev.classList.remove('show')};
  rev.addEventListener('pointerdown',show);rev.addEventListener('pointerup',hide);rev.addEventListener('pointerleave',hide);rev.addEventListener('contextmenu',e=>e.preventDefault());
  $('#inext',m).onclick=()=>reveal(i+1)}
@@ -83,7 +90,7 @@ function imposter(m){
  function discussion(){timeLeft=mins*60;const starter=1+Math.floor(Math.random()*players);ui(m,`<div class="imp-center"><p class="eyebrow">ROUND ${round} · DISCUSSION</p><h2>Baatein shuru!</h2>
  <p class="imp-sub">Sab ek-ek karke word se juda <b>ek hint</b> bolenge — sidha word nahi bolna! Imposter ko pakdo, Imposter ko bachna hai.</p>
  <div class="imp-timer" id="itim">${fmt(timeLeft)}</div>
- <p class="imp-sub">Pehle hint dega: <strong>Player ${starter}</strong></p>
+ <p class="imp-sub">Pehle hint dega: <strong>${esc(nameOf(starter))}</strong></p>
  <div class="controls" style="justify-content:center"><button class="control-btn primary" id="itog">⏸ Pause</button><button class="control-btn" id="iadd">+30 sec</button><button class="control-btn" id="ivote">Voting par jao →</button></div>
  <div class="game-message" id="idmsg" aria-live="polite"></div></div>`);
  let running=true;const tick=()=>{timeLeft--;$('#itim',m).textContent=fmt(Math.max(0,timeLeft));if(timeLeft<=0){clearInterval(timerInt);$('#idmsg',m).textContent='⏰ Time khatm! Ab voting karo.';$('#itog',m).disabled=true}};
@@ -91,15 +98,15 @@ function imposter(m){
  $('#itog',m).onclick=()=>{if(running){clearInterval(timerInt);$('#itog',m).textContent='▶ Resume'}else{timerInt=setInterval(tick,1000);$('#itog',m).textContent='⏸ Pause'}running=!running};
  $('#iadd',m).onclick=()=>{timeLeft+=30;$('#itim',m).textContent=fmt(timeLeft)};
  $('#ivote',m).onclick=()=>{clearInterval(timerInt);votes={};voter(1)}}
- function voter(v){if(v>players)return result();ui(m,`<div class="imp-center"><p class="eyebrow">VOTING · ${v}/${players}</p><h2>Player ${v}, tumhara vote</h2><p class="imp-sub">Tumhe kya lagta hai — Imposter kaun hai? Chhup ke tap karo.</p>
- <div class="choices imp-votes">${Array.from({length:players},(_,k)=>k+1).filter(j=>j!==v).map(j=>`<button class="choice" data-j="${j}">Player ${j}</button>`).join('')}</div></div>`);
+ function voter(v){if(v>players)return result();ui(m,`<div class="imp-center"><p class="eyebrow">VOTING · ${v}/${players}</p><h2>${esc(nameOf(v))}, tumhara vote</h2><p class="imp-sub">Tumhe kya lagta hai — Imposter kaun hai? Chhup ke tap karo.</p>
+ <div class="choices imp-votes">${Array.from({length:players},(_,k)=>k+1).filter(j=>j!==v).map(j=>`<button class="choice" data-j="${j}">${esc(nameOf(j))}</button>`).join('')}</div></div>`);
  $$('.imp-votes .choice',m).forEach(b=>b.onclick=()=>{const j=+b.dataset.j;votes[j]=(votes[j]||0)+1;voter(v+1)})}
  function result(){let top=1,topV=-1;for(let j=1;j<=players;j++){const v=votes[j]||0;if(v>topV){topV=v;top=j}}const caught=impSet.has(top);
  if(caught){for(let j=1;j<=players;j++)if(!impSet.has(j))scores[j]++}else{impSet.forEach(j=>scores[j]+=2)}
- const impList=[...impSet].map(j=>'Player '+j).join(' aur ');
+ const impList=[...impSet].map(j=>nameOf(j)).join(' aur ');
  ui(m,`<div class="imp-center"><p class="eyebrow">REVEAL</p><h2>${caught?'🎉 Imposter pakda gaya!':'😈 Imposter bach gaya!'}</h2>
- <p class="imp-sub">Imposter tha: <strong>${impList}</strong> · Secret word tha: <strong>${word}</strong></p>
- <p class="imp-sub">Sabse zyada votes Player ${top} ko pade (${topV}). ${caught?'Crew ke har player ko +1 point.':'Imposter ko +2 points!'}</p>
+ <p class="imp-sub">Imposter tha: <strong>${esc(impList)}</strong> · Secret word tha: <strong>${word}</strong></p>
+ <p class="imp-sub">Sabse zyada votes ${esc(nameOf(top))} ko pade (${topV}). ${caught?'Crew ke har player ko +1 point.':'Imposter ko +2 points!'}</p>
  ${scoreHTML()}
  <div class="controls" style="justify-content:center;margin-top:18px"><button class="control-btn primary" id="iagain">↻ Ek aur round (Round ${round+1})</button><button class="control-btn" id="isetup">Setup badlo</button></div></div>`);
  $('#iagain',m).onclick=()=>{round++;startRound()};
