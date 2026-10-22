@@ -97,16 +97,23 @@ function imposter(m){
  timerInt=setInterval(tick,1000);
  $('#itog',m).onclick=()=>{if(running){clearInterval(timerInt);$('#itog',m).textContent='▶ Resume'}else{timerInt=setInterval(tick,1000);$('#itog',m).textContent='⏸ Pause'}running=!running};
  $('#iadd',m).onclick=()=>{timeLeft+=30;$('#itim',m).textContent=fmt(timeLeft)};
- $('#ivote',m).onclick=()=>{clearInterval(timerInt);votes={};voter(1)}}
- function voter(v){if(v>players)return result();ui(m,`<div class="imp-center"><p class="eyebrow">VOTING · ${v}/${players}</p><h2>${esc(nameOf(v))}, tumhara vote</h2><p class="imp-sub">Tumhe kya lagta hai — Imposter kaun hai? Chhup ke tap karo.</p>
- <div class="choices imp-votes">${Array.from({length:players},(_,k)=>k+1).filter(j=>j!==v).map(j=>`<button class="choice" data-j="${j}">${esc(nameOf(j))}</button>`).join('')}</div></div>`);
- $$('.imp-votes .choice',m).forEach(b=>b.onclick=()=>{const j=+b.dataset.j;votes[j]=(votes[j]||0)+1;voter(v+1)})}
- function result(){let top=1,topV=-1;for(let j=1;j<=players;j++){const v=votes[j]||0;if(v>topV){topV=v;top=j}}const caught=impSet.has(top);
- if(caught){for(let j=1;j<=players;j++)if(!impSet.has(j))scores[j]++}else{impSet.forEach(j=>scores[j]+=2)}
+ $('#ivote',m).onclick=()=>{clearInterval(timerInt);groupVote()}}
+ function groupVote(){const sel=new Set();
+  function render(){ui(m,`<div class="imp-center"><p class="eyebrow">VOTING</p><h2>Sab discuss karke faisla karo</h2><p class="imp-sub">Saamne sabke naam hain — milkar baat karo aur jise Imposter samajhte ho, use chuno. ${imps>1?`<b>${imps} imposters hain, isliye ${imps} naam</b> chunne hain`:'<b>1 imposter hai, isliye sirf 1 naam</b> chunna hai'} — abhi chune: <b>${sel.size}/${imps}</b></p>
+  <div class="choices imp-votes">${Array.from({length:players},(_,k)=>k+1).map(j=>`<button class="choice${sel.has(j)?' correct':''}" data-j="${j}">${esc(nameOf(j))}</button>`).join('')}</div>
+  <button class="control-btn primary imp-big" id="iconfirm" ${sel.size===imps?'':'disabled'}>Yehi final hai → Pakdo!</button>
+  <p class="imp-sub">Naam par dobara tap karne se chunav hat jayega.</p></div>`);
+  $$('.imp-votes .choice',m).forEach(b=>b.onclick=()=>{const j=+b.dataset.j;if(sel.has(j))sel.delete(j);else{if(sel.size>=imps)return;sel.add(j)}render()});
+  $('#iconfirm',m).onclick=()=>result(sel)}
+  render()}
+ function result(sel){const caughtSet=[...sel].filter(j=>impSet.has(j));const escSet=[...impSet].filter(j=>!sel.has(j));const allCaught=escSet.length===0;const noneCaught=caughtSet.length===0;
+ if(caughtSet.length)for(let j=1;j<=players;j++)if(!impSet.has(j))scores[j]++;
+ escSet.forEach(j=>scores[j]+=2);
  const impList=[...impSet].map(j=>nameOf(j)).join(' aur ');
- ui(m,`<div class="imp-center"><p class="eyebrow">REVEAL</p><h2>${caught?'🎉 Imposter pakda gaya!':'😈 Imposter bach gaya!'}</h2>
+ const selList=[...sel].map(j=>nameOf(j)).join(' aur ');
+ ui(m,`<div class="imp-center"><p class="eyebrow">REVEAL</p><h2>${allCaught?'🎉 Imposter pakda gaya!':noneCaught?'😈 Imposter bach gaya!':'😐 Ek pakda gaya, ek bach gaya!'}</h2>
  <p class="imp-sub">Imposter tha: <strong>${esc(impList)}</strong> · Secret word tha: <strong>${word}</strong></p>
- <p class="imp-sub">Sabse zyada votes ${esc(nameOf(top))} ko pade (${topV}). ${caught?'Crew ke har player ko +1 point.':'Imposter ko +2 points!'}</p>
+ <p class="imp-sub">Group ne in par ungli uthayi thi: <strong>${esc(selList)}</strong>. ${allCaught?'Crew ke har player ko +1 point.':noneCaught?'Imposter ko +2 points!':`Pakde gaye imposter par crew ko safalta — crew ke har player ko +1, aur bache hue Imposter ko +2 points!`}</p>
  ${scoreHTML()}
  <div class="controls" style="justify-content:center;margin-top:18px"><button class="control-btn primary" id="iagain">↻ Ek aur round (Round ${round+1})</button><button class="control-btn" id="isetup">Setup badlo</button></div></div>`);
  $('#iagain',m).onclick=()=>{round++;startRound()};
