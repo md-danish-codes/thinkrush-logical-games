@@ -8,8 +8,20 @@
   "description": "Free brain and logic games to sharpen your mind.",
   "icons": [
     {
+      "src": "https://voaxmnpkckdvkxigtpnb.supabase.co/storage/v1/object/public/portfolio-files/site-images/thinkrush-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://voaxmnpkckdvkxigtpnb.supabase.co/storage/v1/object/public/portfolio-files/site-images/thinkrush-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
       "src": "/assets/favicon.svg",
-      "sizes": "any",
+      "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any"
     }
