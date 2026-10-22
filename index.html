@@ -95,25 +95,35 @@
         <div class="game-search-wrap"><label class="search"><span>⌕</span><input id="gameSearch" type="search" placeholder="Find a game…" aria-label="Find a game"></label></div>
       </div>
       <div class="filter-row" role="tablist" aria-label="Game categories">
-        <button class="filter active" data-filter="all">All games <span>11</span></button>
+        <button class="filter active" data-filter="all">All games <span>12</span></button>
         <button class="filter" data-filter="logic">Logic</button>
         <button class="filter" data-filter="memory">Memory</button>
         <button class="filter" data-filter="speed">Speed</button>
         <button class="filter" data-filter="strategy">Strategy</button>
         <button class="filter" data-filter="words">Words & numbers</button>
+        <button class="filter" data-filter="party">Party</button>
+      </div>
+      <div class="filter-row" role="tablist" aria-label="Number of players" style="margin-top:10px">
+        <button class="filter pfilter active" data-players="all">All players</button>
+        <button class="filter pfilter" data-players="1">👤 1 Player</button>
+        <button class="filter pfilter" data-players="2">👥 2 Players</button>
+        <button class="filter pfilter" data-players="3">3 Players</button>
+        <button class="filter pfilter" data-players="4">4 Players</button>
+        <button class="filter pfilter" data-players="5">🎉 Group (5+)</button>
       </div>
       <div class="games-grid-v2" id="gamesGrid">
-        <a class="game-card-v2 featured" data-category="logic" href="./games/pattern-recognition.html"><div class="card-top"><span class="game-no">01</span><span class="card-arrow">↗</span></div><div class="game-symbol sequence-symbol"><i></i><i></i><i></i><i></i></div><h3>Pattern Recognition</h3><p>Spot the rule. Predict what comes next.</p><span class="card-tag">LOGIC</span></a>
-        <a class="game-card-v2" data-category="memory" href="./games/memory-match.html"><div class="card-top"><span class="game-no">02</span><span class="card-arrow">↗</span></div><div class="game-symbol memory-symbol"><span>◈</span><span>◈</span></div><h3>Memory Match</h3><p>Flip, remember, match every pair.</p><span class="card-tag">MEMORY</span></a>
-        <a class="game-card-v2" data-category="speed" href="./games/reaction-test.html"><div class="card-top"><span class="game-no">03</span><span class="card-arrow">↗</span></div><div class="game-symbol bolt-symbol">ϟ</div><h3>Reaction Test</h3><p>How fast can you react when it matters?</p><span class="card-tag">SPEED</span></a>
-        <a class="game-card-v2" data-category="logic" href="./games/sudoku.html"><div class="card-top"><span class="game-no">04</span><span class="card-arrow">↗</span></div><div class="game-symbol grid-symbol">1 2 3<br>4 5 6<br>7 8 9</div><h3>Sudoku</h3><p>Fill every row, column and box with logic.</p><span class="card-tag">LOGIC</span></a>
-        <a class="game-card-v2" data-category="strategy" href="./games/chess.html"><div class="card-top"><span class="game-no">05</span><span class="card-arrow">↗</span></div><div class="game-symbol chess-symbol">♞</div><h3>Chess</h3><p>Local two-player strategy, move by move.</p><span class="card-tag">STRATEGY</span></a>
-        <a class="game-card-v2" data-category="words" href="./games/quiz.html"><div class="card-top"><span class="game-no">06</span><span class="card-arrow">↗</span></div><div class="game-symbol quiz-symbol">?</div><h3>Quiz</h3><p>Quick questions for knowledge and logic.</p><span class="card-tag">QUIZ</span></a>
-        <a class="game-card-v2" data-category="strategy" href="./games/tic-tac-toe.html"><div class="card-top"><span class="game-no">07</span><span class="card-arrow">↗</span></div><div class="game-symbol xo-symbol"><span>×</span><span>○</span></div><h3>Tic-Tac-Toe</h3><p>Classic three-in-a-row with a smart opponent.</p><span class="card-tag">STRATEGY</span></a>
-        <a class="game-card-v2" data-category="words" href="./games/word-puzzle.html"><div class="card-top"><span class="game-no">08</span><span class="card-arrow">↗</span></div><div class="game-symbol letter-symbol">AB</div><h3>Word Puzzle</h3><p>Unscramble letters. Find the hidden word.</p><span class="card-tag">WORDS</span></a>
-        <a class="game-card-v2" data-category="words" href="./games/number-challenge.html"><div class="card-top"><span class="game-no">09</span><span class="card-arrow">↗</span></div><div class="game-symbol number-symbol">123</div><h3>Number Challenge</h3><p>Race the clock through arithmetic.</p><span class="card-tag">NUMBERS</span></a>
-        <a class="game-card-v2" data-category="logic" href="./games/logic-puzzle.html"><div class="card-top"><span class="game-no">10</span><span class="card-arrow">↗</span></div><div class="game-symbol diamond-symbol">◆</div><h3>Logic Puzzle</h3><p>Short riddles with a twist.</p><span class="card-tag">LOGIC</span></a>
-        <a class="game-card-v2" data-category="strategy" href="./games/2048.html"><div class="card-top"><span class="game-no">11</span><span class="card-arrow">↗</span></div><div class="game-symbol tile-symbol"><span>2</span><span>0</span><span>4</span><span>8</span></div><h3>2048</h3><p>Merge tiles, plan ahead, keep going.</p><span class="card-tag">STRATEGY</span></a>
+        <a class="game-card-v2 featured" data-category="logic" data-players="1" href="./games/pattern-recognition.html"><div class="card-top"><span class="game-no">01</span><span class="card-arrow">↗</span></div><div class="game-symbol sequence-symbol"><i></i><i></i><i></i><i></i></div><h3>Pattern Recognition</h3><p>Spot the rule. Predict what comes next.</p><span class="card-tag">LOGIC</span></a>
+        <a class="game-card-v2" data-category="memory" data-players="1" href="./games/memory-match.html"><div class="card-top"><span class="game-no">02</span><span class="card-arrow">↗</span></div><div class="game-symbol memory-symbol"><span>◈</span><span>◈</span></div><h3>Memory Match</h3><p>Flip, remember, match every pair.</p><span class="card-tag">MEMORY</span></a>
+        <a class="game-card-v2" data-category="speed" data-players="1" href="./games/reaction-test.html"><div class="card-top"><span class="game-no">03</span><span class="card-arrow">↗</span></div><div class="game-symbol bolt-symbol">ϟ</div><h3>Reaction Test</h3><p>How fast can you react when it matters?</p><span class="card-tag">SPEED</span></a>
+        <a class="game-card-v2" data-category="logic" data-players="1" href="./games/sudoku.html"><div class="card-top"><span class="game-no">04</span><span class="card-arrow">↗</span></div><div class="game-symbol grid-symbol">1 2 3<br>4 5 6<br>7 8 9</div><h3>Sudoku</h3><p>Fill every row, column and box with logic.</p><span class="card-tag">LOGIC</span></a>
+        <a class="game-card-v2" data-category="strategy" data-players="2" href="./games/chess.html"><div class="card-top"><span class="game-no">05</span><span class="card-arrow">↗</span></div><div class="game-symbol chess-symbol">♞</div><h3>Chess</h3><p>Local two-player strategy, move by move.</p><span class="card-tag">STRATEGY</span></a>
+        <a class="game-card-v2" data-category="words" data-players="1" href="./games/quiz.html"><div class="card-top"><span class="game-no">06</span><span class="card-arrow">↗</span></div><div class="game-symbol quiz-symbol">?</div><h3>Quiz</h3><p>Quick questions for knowledge and logic.</p><span class="card-tag">QUIZ</span></a>
+        <a class="game-card-v2" data-category="strategy" data-players="1 2" href="./games/tic-tac-toe.html"><div class="card-top"><span class="game-no">07</span><span class="card-arrow">↗</span></div><div class="game-symbol xo-symbol"><span>×</span><span>○</span></div><h3>Tic-Tac-Toe</h3><p>Classic three-in-a-row with a smart opponent.</p><span class="card-tag">STRATEGY</span></a>
+        <a class="game-card-v2" data-category="words" data-players="1" href="./games/word-puzzle.html"><div class="card-top"><span class="game-no">08</span><span class="card-arrow">↗</span></div><div class="game-symbol letter-symbol">AB</div><h3>Word Puzzle</h3><p>Unscramble letters. Find the hidden word.</p><span class="card-tag">WORDS</span></a>
+        <a class="game-card-v2" data-category="words" data-players="1" href="./games/number-challenge.html"><div class="card-top"><span class="game-no">09</span><span class="card-arrow">↗</span></div><div class="game-symbol number-symbol">123</div><h3>Number Challenge</h3><p>Race the clock through arithmetic.</p><span class="card-tag">NUMBERS</span></a>
+        <a class="game-card-v2" data-category="logic" data-players="1" href="./games/logic-puzzle.html"><div class="card-top"><span class="game-no">10</span><span class="card-arrow">↗</span></div><div class="game-symbol diamond-symbol">◆</div><h3>Logic Puzzle</h3><p>Short riddles with a twist.</p><span class="card-tag">LOGIC</span></a>
+        <a class="game-card-v2" data-category="strategy" data-players="1" href="./games/2048.html"><div class="card-top"><span class="game-no">11</span><span class="card-arrow">↗</span></div><div class="game-symbol tile-symbol"><span>2</span><span>0</span><span>4</span><span>8</span></div><h3>2048</h3><p>Merge tiles, plan ahead, keep going.</p><span class="card-tag">STRATEGY</span></a>
+        <a class="game-card-v2" data-category="party" data-players="3 4 5" href="./games/imposter.html"><div class="card-top"><span class="game-no">12</span><span class="card-arrow">↗</span></div><div class="game-symbol spy-symbol">🕵</div><h3>Imposter</h3><p>Ek imposter chhupa hai. Baaton se use pakdo.</p><span class="card-tag">PARTY · 3–10 PLAYERS</span></a>
       </div>
       <div class="empty-games" id="emptyGames" hidden>No game matched that search. Try another word.</div>
     </section>
@@ -140,9 +150,11 @@
     (()=>{
       const search=document.getElementById('gameSearch'), cards=[...document.querySelectorAll('.game-card-v2')], empty=document.getElementById('emptyGames');
       let filter='all';
-      function render(){const q=(search.value||'').toLowerCase().trim();let shown=0;cards.forEach(card=>{const ok=(filter==='all'||card.dataset.category===filter)&&(!q||card.textContent.toLowerCase().includes(q));card.hidden=!ok;if(ok)shown++});empty.hidden=shown!==0}
-      document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));btn.classList.add('active');filter=btn.dataset.filter;render()}));
+      let pfilter='all';
+      function render(){const q=(search.value||'').toLowerCase().trim();let shown=0;cards.forEach(card=>{const ok=(filter==='all'||card.dataset.category===filter)&&(pfilter==='all'||(card.dataset.players||'').split(' ').includes(pfilter))&&(!q||card.textContent.toLowerCase().includes(q));card.hidden=!ok;if(ok)shown++});empty.hidden=shown!==0}
+      document.querySelectorAll('.filter[data-filter]').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.filter[data-filter]').forEach(x=>x.classList.remove('active'));btn.classList.add('active');filter=btn.dataset.filter;render()}));
       search.addEventListener('input',render);
+      document.querySelectorAll('.pfilter').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.pfilter').forEach(x=>x.classList.remove('active'));btn.classList.add('active');pfilter=btn.dataset.players;render()}));
       const menu=document.querySelector('.menu-toggle'),nav=document.querySelector('.nav'); menu.addEventListener('click',()=>{const open=menu.getAttribute('aria-expanded')==='true';menu.setAttribute('aria-expanded',String(!open));nav.classList.toggle('open',!open)});
     })();
   </script>

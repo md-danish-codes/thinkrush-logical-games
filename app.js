@@ -10,10 +10,11 @@ const games={
  'reaction-test':{title:'Reaction Test',desc:'Measure how quickly you respond when the screen turns green.'},
  'word-puzzle':{title:'Word Puzzle',desc:'Unscramble letters and reveal the hidden word.'},
  'logic-puzzle':{title:'Logic Puzzle',desc:'Solve short riddles and lateral-thinking questions.'},
- '2048':{title:'2048',desc:'Merge equal tiles and build the 2048 tile.'}
+ '2048':{title:'2048',desc:'Merge equal tiles and build the 2048 tile.'},
+ imposter:{title:'Imposter',desc:'Pass-and-play party game. Everyone learns the secret word — except the imposter. Talk, bluff, vote and unmask!'}
 };
 function shell(game){document.body.insertAdjacentHTML('afterbegin','<a class="skip-link" href="#main">Skip to content</a>');document.body.innerHTML=document.body.innerHTML;}
-function gamePage(){const id=document.body.dataset.game;if(!id||!games[id])return;const meta=games[id];$('.game-title').textContent=meta.title;$('.game-desc').textContent=meta.desc;$('title').textContent=`${meta.title} — ThinkRush Logical Games`;const mount=$('#game');({quiz:quiz,sudoku:sudoku,'tic-tac-toe':ttt,chess:chess,'memory-match':memory,'pattern-recognition':pattern,'number-challenge':number,'reaction-test':reaction,'word-puzzle':word,'logic-puzzle':logic,'2048':game2048}[id])(mount);}
+function gamePage(){const id=document.body.dataset.game;if(!id||!games[id])return;const meta=games[id];$('.game-title').textContent=meta.title;$('.game-desc').textContent=meta.desc;$('title').textContent=`${meta.title} — ThinkRush Logical Games`;const mount=$('#game');({quiz:quiz,sudoku:sudoku,'tic-tac-toe':ttt,chess:chess,'memory-match':memory,'pattern-recognition':pattern,'number-challenge':number,'reaction-test':reaction,'word-puzzle':word,'logic-puzzle':logic,'2048':game2048,imposter:imposter}[id])(mount);}
 function ui(mount,html){mount.innerHTML=html;return mount}
 const quizData=[
 ['Which number is prime?',['21','29','39','51'],1],['If all bloops are razzies and all razzies are green, bloops are…',['Blue','Green','Red','Unknown'],1],['What is 12 × 8?',['86','96','108','112'],1],['Which shape has exactly three sides?',['Square','Triangle','Circle','Hexagon'],1],['What is the next number: 2, 4, 8, 16, ?',['18','24','30','32'],3],['Which planet is known for its rings?',['Mars','Saturn','Venus','Mercury'],1],['A clock shows 3:00. What is the smaller angle?',['30°','45°','60°','90°'],3],['Which word does not belong?',['Apple','Banana','Carrot','Mango'],2],['If CAT becomes DBU, then DOG becomes…',['EPH','EOH','EPG','FPH'],0],['What is 100 ÷ 4?',['20','25','30','40'],1]
@@ -44,4 +45,66 @@ function game2048(m){let board,score;ui(m,`<div class="status-bar"><span>Score <
 function chess(m){ui(m,`<div class="controls"><button class="control-btn primary" id="cnew">New game</button><span class="tiny">Chess engine loads from the public CDN on this page.</span></div><div class="chess-area"><div><div class="chess-board" id="cboard" aria-label="Chess board"></div></div><aside class="chess-side"><div class="status-bar"><span>Turn <strong id="cturn">White</strong></span><span id="cstatus">Ready</span></div><div class="move-list" id="cmoves"></div></aside></div>`);const load=document.createElement('script');load.src='https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js';load.onload=()=>runChess();load.onerror=()=>{$('#cstatus',m).textContent='Chess engine could not load. Check internet and refresh.'};document.head.appendChild(load);function runChess(){let game=new Chess(),selected=null;const pieces={p:'♟',r:'♜',n:'♞',b:'♝',q:'♛',k:'♚'};function render(){const b=$('#cboard',m);b.innerHTML='';const moves=selected?game.moves({square:selected,verbose:true}).map(x=>x.to):[];for(let r=0;r<8;r++)for(let c=0;c<8;c++){const sq='abcdefgh'[c]+(8-r),p=game.get(sq),el=document.createElement('button');el.className='square '+((r+c)%2?'dark':'light')+(sq===selected?' selected':'')+(moves.includes(sq)?' legal':'');el.setAttribute('aria-label',sq);el.textContent=p?piece(p):'';el.onclick=()=>click(sq);b.appendChild(el)}$('#cturn',m).textContent=game.turn()==='w'?'White':'Black';$('#cstatus',m).textContent=game.game_over()?(game.in_checkmate()?'Checkmate!':game.in_draw()?'Draw.':'Game over.'):(game.in_check()?'Check!':'');$('#cmoves',m).innerHTML=game.history().map((x,i)=>`<div>${i+1}. ${x}</div>`).join('')}function piece(p){const white={p:'♙',r:'♖',n:'♘',b:'♗',q:'♕',k:'♔'};const black={p:'♟',r:'♜',n:'♞',b:'♝',q:'♛',k:'♚'};return (p.color==='w'?white:black)[p.type]}function click(sq){if(game.game_over())return;const p=game.get(sq);if(selected){const mv=game.move({from:selected,to:sq,promotion:'q'});if(mv){selected=null;render();return}selected=p&&p.color===game.turn()?sq:null;render()}else if(p&&p.color===game.turn()){selected=sq;render()}}$('#cnew',m).onclick=()=>{game.reset();selected=null;render()};render()}}
 
 const mtBtn=document.querySelector('.menu-toggle'),nvEl=document.querySelector('.nav');if(mtBtn&&nvEl&&!document.body.dataset.page){mtBtn.addEventListener('click',()=>{const open=mtBtn.getAttribute('aria-expanded')==='true';mtBtn.setAttribute('aria-expanded',String(!open));nvEl.classList.toggle('open',!open)});}
+const impWords={
+ Food:['Pizza','Biryani','Samosa','Burger','Momos','Maggi','Dosa','Pasta','Jalebi','Sandwich','Chaat','Pancake'],
+ Places:['School','Beach','Hospital','Cinema','Railway Station','Market','Temple','Airport','Library','Stadium','Zoo','Hotel'],
+ Jobs:['Doctor','Teacher','Chef','Pilot','Farmer','Singer','Police Officer','Driver','Artist','Engineer','Barber','Actor'],
+ Animals:['Dog','Elephant','Lion','Cat','Horse','Monkey','Tiger','Cow','Snake','Peacock','Fish','Bear'],
+ 'College Life':['Hostel','Exam Hall','Canteen','Lecture','Assignment','Fest','Library Card','Attendance','Group Study','Viva','Practical File','Semester Break']};
+const impState={scores:{},players:0};
+function imposter(m){
+ let players=5,imps=1,cat='Mixed',mins=2,scores=impState.scores,word='',impSet=new Set(),round=1,timerInt=null,timeLeft=0,votes={};
+ if(impState.players!==players){scores={};impState.scores=scores;impState.players=players}
+ function scoreHTML(){const rows=Object.keys(scores);if(!rows.length)return'';return `<div class="imp-scores"><strong>Scores</strong>${rows.map(k=>`<span>Player ${k}: <b>${scores[k]}</b></span>`).join('')}</div>`}
+ function setup(){clearInterval(timerInt);ui(m,`<div class="status-bar"><span>Pass &amp; Play</span><span>3–10 players · 1 phone</span></div>
+ <div class="imp-block"><p class="imp-label">Kitne players?</p><div class="imp-count"><button class="control-btn" id="im">−</button><strong id="ipl">${players}</strong><button class="control-btn" id="ip">+</button></div></div>
+ <div class="imp-block"><p class="imp-label">Category</p><div class="choices" id="icat">${['Mixed',...Object.keys(impWords)].map(c=>`<button class="choice${c===cat?' correct':''}" data-c="${c}">${c}</button>`).join('')}</div></div>
+ <div class="imp-block"><p class="imp-label">Imposters</p><div class="choices" id="iimp">${[1,2].map(n=>`<button class="choice${n===imps?' correct':''}" data-n="${n}">${n}</button>`).join('')}</div></div>
+ <div class="imp-block"><p class="imp-label">Discussion time</p><div class="choices" id="itime">${[1,2,3].map(n=>`<button class="choice${n===mins?' correct':''}" data-n="${n}">${n} min</button>`).join('')}</div></div>
+ <button class="control-btn primary imp-big" id="istart">Game shuru karo →</button>
+ <div class="game-message">Ek hi phone sabke haath me ghumega. Sabko secret word milega — <b>sirf Imposter ko nahi!</b> Use baaton se word guess karke bachna hai.</div>${scoreHTML()}`);
+ $('#im',m).onclick=()=>{players=Math.max(3,players-1);if(imps>=players-1)imps=1;$('#ipl',m).textContent=players};
+ $('#ip',m).onclick=()=>{players=Math.min(10,players+1);$('#ipl',m).textContent=players};
+ $$('#icat .choice',m).forEach(b=>b.onclick=()=>{cat=b.dataset.c;$$('#icat .choice',m).forEach(x=>x.classList.toggle('correct',x===b))});
+ $$('#iimp .choice',m).forEach(b=>b.onclick=()=>{const n=+b.dataset.n;if(n===2&&players<5){$('#istart',m).scrollIntoView();return}imps=n;$$('#iimp .choice',m).forEach(x=>x.classList.toggle('correct',x===b))});
+ $$('#itime .choice',m).forEach(b=>b.onclick=()=>{mins=+b.dataset.n;$$('#itime .choice',m).forEach(x=>x.classList.toggle('correct',x===b))});
+ $('#istart',m).onclick=()=>{if(impState.players!==players){scores={};impState.scores=scores;impState.players=players}for(let i=1;i<=players;i++)if(scores[i]===undefined)scores[i]=0;startRound()}}
+ function startRound(){const pool=cat==='Mixed'?Object.values(impWords).flat():impWords[cat];word=pool[Math.floor(Math.random()*pool.length)];impSet=new Set();while(impSet.size<imps)impSet.add(1+Math.floor(Math.random()*players));reveal(1)}
+ function reveal(i){if(i>players)return discussion();const isImp=impSet.has(i);ui(m,`<div class="imp-center"><p class="eyebrow">PHONE PLAYER ${i} KO DO</p><h2>Player ${i}</h2><p class="imp-sub">Baaki sab door dekho! Sirf Player ${i} apna word dekhega.</p>
+ <div class="imp-reveal" id="irev"><span id="irevt">👁️ DABAA KE RAKHO</span></div>
+ <p class="imp-sub">Button par ungli dabaa ke rakho — word dikhega. Chhodo ge to chhup jayega.</p>
+ <button class="control-btn primary imp-big" id="inext" disabled>Dekh liya → ${i===players?'Discussion shuru':'Player '+(i+1)+' ko do'}</button></div>`);
+ const rev=$('#irev',m),rt=$('#irevt',m);let seen=false;
+ const show=e=>{e.preventDefault();rt.textContent=isImp?'🕵️ TUM IMPOSTER HO!':word;rev.classList.add('show');if(!seen){seen=true;$('#inext',m).disabled=false}};
+ const hide=()=>{rt.textContent='👁️ DABAA KE RAKHO';rev.classList.remove('show')};
+ rev.addEventListener('pointerdown',show);rev.addEventListener('pointerup',hide);rev.addEventListener('pointerleave',hide);rev.addEventListener('contextmenu',e=>e.preventDefault());
+ $('#inext',m).onclick=()=>reveal(i+1)}
+ function fmt(t){return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')}
+ function discussion(){timeLeft=mins*60;const starter=1+Math.floor(Math.random()*players);ui(m,`<div class="imp-center"><p class="eyebrow">ROUND ${round} · DISCUSSION</p><h2>Baatein shuru!</h2>
+ <p class="imp-sub">Sab ek-ek karke word se juda <b>ek hint</b> bolenge — sidha word nahi bolna! Imposter ko pakdo, Imposter ko bachna hai.</p>
+ <div class="imp-timer" id="itim">${fmt(timeLeft)}</div>
+ <p class="imp-sub">Pehle hint dega: <strong>Player ${starter}</strong></p>
+ <div class="controls" style="justify-content:center"><button class="control-btn primary" id="itog">⏸ Pause</button><button class="control-btn" id="iadd">+30 sec</button><button class="control-btn" id="ivote">Voting par jao →</button></div>
+ <div class="game-message" id="idmsg" aria-live="polite"></div></div>`);
+ let running=true;const tick=()=>{timeLeft--;$('#itim',m).textContent=fmt(Math.max(0,timeLeft));if(timeLeft<=0){clearInterval(timerInt);$('#idmsg',m).textContent='⏰ Time khatm! Ab voting karo.';$('#itog',m).disabled=true}};
+ timerInt=setInterval(tick,1000);
+ $('#itog',m).onclick=()=>{if(running){clearInterval(timerInt);$('#itog',m).textContent='▶ Resume'}else{timerInt=setInterval(tick,1000);$('#itog',m).textContent='⏸ Pause'}running=!running};
+ $('#iadd',m).onclick=()=>{timeLeft+=30;$('#itim',m).textContent=fmt(timeLeft)};
+ $('#ivote',m).onclick=()=>{clearInterval(timerInt);votes={};voter(1)}}
+ function voter(v){if(v>players)return result();ui(m,`<div class="imp-center"><p class="eyebrow">VOTING · ${v}/${players}</p><h2>Player ${v}, tumhara vote</h2><p class="imp-sub">Tumhe kya lagta hai — Imposter kaun hai? Chhup ke tap karo.</p>
+ <div class="choices imp-votes">${Array.from({length:players},(_,k)=>k+1).filter(j=>j!==v).map(j=>`<button class="choice" data-j="${j}">Player ${j}</button>`).join('')}</div></div>`);
+ $$('.imp-votes .choice',m).forEach(b=>b.onclick=()=>{const j=+b.dataset.j;votes[j]=(votes[j]||0)+1;voter(v+1)})}
+ function result(){let top=1,topV=-1;for(let j=1;j<=players;j++){const v=votes[j]||0;if(v>topV){topV=v;top=j}}const caught=impSet.has(top);
+ if(caught){for(let j=1;j<=players;j++)if(!impSet.has(j))scores[j]++}else{impSet.forEach(j=>scores[j]+=2)}
+ const impList=[...impSet].map(j=>'Player '+j).join(' aur ');
+ ui(m,`<div class="imp-center"><p class="eyebrow">REVEAL</p><h2>${caught?'🎉 Imposter pakda gaya!':'😈 Imposter bach gaya!'}</h2>
+ <p class="imp-sub">Imposter tha: <strong>${impList}</strong> · Secret word tha: <strong>${word}</strong></p>
+ <p class="imp-sub">Sabse zyada votes Player ${top} ko pade (${topV}). ${caught?'Crew ke har player ko +1 point.':'Imposter ko +2 points!'}</p>
+ ${scoreHTML()}
+ <div class="controls" style="justify-content:center;margin-top:18px"><button class="control-btn primary" id="iagain">↻ Ek aur round (Round ${round+1})</button><button class="control-btn" id="isetup">Setup badlo</button></div></div>`);
+ $('#iagain',m).onclick=()=>{round++;startRound()};
+ $('#isetup',m).onclick=()=>{round=1;setup()}}
+ setup();
+}
+
 gamePage();
